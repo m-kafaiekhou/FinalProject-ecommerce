@@ -6,24 +6,21 @@ from core.utils import phone_regex
 
 class CustomUserManager(BaseUserManager):
 
-    def create_user(self, username, email, first_name, last_name, phone_number, password):
+    def create_user(self, email, first_name, last_name, phone_number, password, **other_fields):
             
         user = self.model(
-            username=username,
+            phone_number=self.normalize_phone_number(phone_number),
             email=self.normalize_email(email),
             first_name=first_name,
             last_name=last_name,
-            phone_number=self.normalize_phone_number(phone_number),
+            **other_fields
         )
         user.set_password(password)
         user.save()
         return user
 
-    def create_superuser(self, username, email, first_name, last_name, phone_number, password):
-        user = self.create_user(username, email, first_name, last_name, phone_number, password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save()
+    def create_superuser(self, email, first_name, last_name, phone_number, password):
+        user = self.create_user(email, first_name, last_name, phone_number, password, is_staff=True, is_superuser=True)
         return user
 
     @staticmethod
